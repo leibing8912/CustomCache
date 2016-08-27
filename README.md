@@ -49,6 +49,6 @@ mSpLocalCache.read(ModelActivity.this, new SpLocalCache.LocalCacheCallBack() {
                     }
                 });
 
-#### if you find problems ,you just click [leibing@126.com]("leibing1989@126.com") to mail me.
-#### if you Approve me,please start me.
+#### if you find problems ,you just to mail me. my mail : leibing1989@126.com.
+#### if you Approve me,please star me.
 
