@@ -40,14 +40,16 @@ public class SpLocalCache<T> {
         ThreadManager.getInstance().getNewCachedThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                if (cacheSet == null)
-                    return;
-                for(String cacheName:cacheSet){
-                    SharedPreferences spLc = context.getSharedPreferences(
-                            cacheName,
-                            Context.MODE_PRIVATE
-                    );
-                    spLc.edit().clear().commit();
+                synchronized (SpLocalCache.class) {
+                    if (cacheSet == null)
+                        return;
+                    for (String cacheName : cacheSet) {
+                        SharedPreferences spLc = context.getSharedPreferences(
+                                cacheName,
+                                Context.MODE_PRIVATE
+                        );
+                        spLc.edit().clear().commit();
+                    }
                 }
             }
         });
@@ -76,7 +78,6 @@ public class SpLocalCache<T> {
      */
     public SpLocalCache(Class<T> forWhich, Class modelClass){
         cacheName = forWhich.getName() + "_" + modelClass.getName();
-        System.out.println("ddddddddddddddddddd cacheName = " + cacheName);
     }
 
     /**
@@ -89,19 +90,21 @@ public class SpLocalCache<T> {
      * @return
      */
     public void save(final Context context, final T data){
-                final SharedPreferences spLc = context.getSharedPreferences(
-                        cacheName,
-                        Context.MODE_PRIVATE
-                );
                 ThreadManager.getInstance().getNewCachedThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
-                        String strData = base64Encode(data);
-                        if (strData != null)
-                            spLc.edit()
-                                    .putString(KEY_DATA, base64Encode(data))
-                                    .commit();
-                        SharePreferenceUtil.getInstance(context).setSpLocalCache(cacheName);
+                        synchronized (SpLocalCache.class) {
+                            final SharedPreferences spLc = context.getSharedPreferences(
+                                    cacheName,
+                                    Context.MODE_PRIVATE
+                            );
+                            String strData = base64Encode(data);
+                            if (strData != null)
+                                spLc.edit()
+                                        .putString(KEY_DATA, base64Encode(data))
+                                        .commit();
+                            SharePreferenceUtil.getInstance(context).setSpLocalCache(cacheName);
+                        }
                     }
                 });
     }
@@ -116,31 +119,25 @@ public class SpLocalCache<T> {
      * @return
      */
     public void read(final Context context,  final LocalCacheCallBack localCacheCallBack){
-        SharedPreferences spLc = context.getSharedPreferences(
-                cacheName,
-                Context.MODE_PRIVATE
-        );
-        final String strData = spLc.getString(KEY_DATA, null);
         ThreadManager.getInstance().getNewCachedThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                if (StringUtil.isNotEmpty(strData)) {
-                    final Object obj = base64Decode(strData);
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (localCacheCallBack != null)
-                                localCacheCallBack.readCacheComplete(obj);
-                        }
-                    });
-                } else {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (localCacheCallBack != null)
-                                localCacheCallBack.readCacheComplete(null);
-                        }
-                    });
+                synchronized (SpLocalCache.class) {
+                    SharedPreferences spLc = context.getSharedPreferences(
+                            cacheName,
+                            Context.MODE_PRIVATE
+                    );
+                    final String strData = spLc.getString(KEY_DATA, null);
+                    if (StringUtil.isNotEmpty(strData)) {
+                        final Object obj = base64Decode(strData);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (localCacheCallBack != null)
+                                    localCacheCallBack.readCacheComplete(obj);
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -176,11 +173,13 @@ public class SpLocalCache<T> {
                 ThreadManager.getInstance().getNewCachedThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
-                        SharedPreferences spLc = context.getSharedPreferences(
-                                cacheName,
-                                Context.MODE_PRIVATE
-                        );
-                        spLc.edit().putString(KEY_DATA, "").commit();
+                        synchronized (SpLocalCache.class) {
+                            SharedPreferences spLc = context.getSharedPreferences(
+                                    cacheName,
+                                    Context.MODE_PRIVATE
+                            );
+                            spLc.edit().putString(KEY_DATA, "").commit();
+                        }
                     }
                 });
     }
