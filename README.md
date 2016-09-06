@@ -1,8 +1,8 @@
 # CustomCache
 一个基于xml格式数据保存的本地缓存方案,支持对象缓存兼容列表缓存,减弱对sqlite的依赖.
 
-## How to Uses
-example code:
+## Usage
+MainActivity.class:
 ```java
 public class MainActivity extends AppCompatActivity {
 
@@ -95,16 +95,28 @@ public class MainActivity extends AppCompatActivity {
     
 ```
 ### Dependencies
-```java
-buildscript {
-  repositories {
-     jcenter()
-   }
-}
 
+gradle:
+```java
 dependencies {
-    compile 'cn.jianke.customcache:app:1.0.1'
+    compile 'cn.jianke.customcache:app:1.0.4'
 }
+```
+maven:
+```java
+<dependency>
+  <groupId>cn.jianke.customcache</groupId>
+  <artifactId>app</artifactId>
+  <version>1.0.4</version>
+  <type>pom</type>
+</dependency>
+```
+
+lvy:
+```java
+<dependency org='cn.jianke.customcache' name='app' rev='1.0.4'>
+  <artifact name='$AID' ext='pom'></artifact>
+</dependency>
 ```
 
 ### License
